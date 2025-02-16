@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "mariadb": "npm:mariadb@3.4.0"
+  }
+}

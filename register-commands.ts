@@ -9,16 +9,20 @@ const commands: Command[] = [];
 
 await parseCommands(command => commands.push(command));
 
+const commandJsons = commands.map(command => command.data.toJSON());
+
 const rest = new REST().setToken(constants.token);
 
 (async () => {
     try {
         console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-        await rest.put(
-            Routes.applicationGuildCommands(constants.clientId, constants.devServerId),
-            { body: commands.map(command => command.data.toJSON()) },
-        );
+        for (const serverId of constants.devServerIds) {
+            await rest.put(
+                Routes.applicationGuildCommands(constants.clientId, serverId),
+                { body: commandJsons },
+            );
+        }
 
         console.log('Successfully reloaded application (/) commands.');
     } catch (error) {

@@ -1,7 +1,8 @@
 #!/usr/bin/env -S deno run -A
 
 import * as cheerio from 'npm:cheerio@1.0.0';
-import {LACoClosure, LACoClosureStatus} from './types.d.ts';
+import { LACoClosure } from './types.d.ts';
+import { LACoClosureStatus, laCoClosureStatusMap } from "./road-closures.ts";
 
 export async function getLACoRoadClosures() {
     const $ = await cheerio.fromURL('https://pw.lacounty.gov/roadclosures/list_closures.cfm');
@@ -21,7 +22,7 @@ export async function getLACoRoadClosures() {
                         isActive: status.attr('color') !== '#ab7200',
                         community: location[0].trim(),
                         location: location[1].trim(),
-                        status: status.text() as LACoClosureStatus,
+                        status: laCoClosureStatusMap.get(status.text()) ?? LACoClosureStatus.UNKNOWN,
                         reason: $('td:nth(2)', element).text().trim(),
                         beginDate: !Number.isNaN(beginDate) ? beginDate : beginDateString,
                         endDate: !Number.isNaN(endDate) ? endDate : endDateString,
@@ -33,4 +34,4 @@ export async function getLACoRoadClosures() {
     });
 }
 
-console.log(await getLACoRoadClosures());
+//console.log(await getLACoRoadClosures());
